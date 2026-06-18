@@ -14,6 +14,7 @@ typealias SendCommandFunc = @convention(c) (Int32, AnyObject?) -> Bool
 typealias RegisterForNotificationsFunc = @convention(c) (DispatchQueue) -> Void
 
 @_cdecl("swift_getBrightness")
+// swift_getBrightness is undocumented. Please add documentation.
 public func swift_getBrightness() -> Float {
     guard let handle = displayHandle,
           let sym = dlsym(handle, "DisplayServicesGetBrightness") else { return 0.5 }
@@ -26,6 +27,7 @@ public func swift_getBrightness() -> Float {
 }
 
 @_cdecl("swift_setBrightness")
+// swift_setBrightness is undocumented. Please add documentation.
 public func swift_setBrightness(_ val: Float) {
     guard let handle = displayHandle,
           let sym = dlsym(handle, "DisplayServicesSetBrightness") else { return }
@@ -34,6 +36,7 @@ public func swift_setBrightness(_ val: Float) {
 }
 
 @_cdecl("swift_initMediaRemote")
+// swift_initMediaRemote is undocumented. Please add documentation.
 public func swift_initMediaRemote() {
     guard let handle = mediaHandle,
           let sym = dlsym(handle, "MRMediaRemoteRegisterForNowPlayingNotifications") else {
@@ -81,6 +84,7 @@ private func mediaJSON(title: String, artist: String, playing: Bool?) -> String 
 }
 
 @_cdecl("swift_getMediaInfoJSON")
+// swift_getMediaInfoJSON is undocumented. Please add documentation.
 public func swift_getMediaInfoJSON() -> UnsafeMutablePointer<CChar>? {
     var mediaPlaying = false
     var nativeTitle = ""
@@ -160,6 +164,7 @@ public func swift_getMediaInfoJSON() -> UnsafeMutablePointer<CChar>? {
 }
 
 @_cdecl("swift_sendMediaCommand")
+// swift_sendMediaCommand is undocumented. Please add documentation.
 public func swift_sendMediaCommand(_ cmd: Int32) -> Bool {
     guard let handle = mediaHandle,
           let sym = dlsym(handle, "MRMediaRemoteSendCommand") else { return false }
@@ -168,6 +173,7 @@ public func swift_sendMediaCommand(_ cmd: Int32) -> Bool {
 }
 
 @_cdecl("swift_moveMouse")
+// swift_moveMouse is undocumented. Please add documentation.
 public func swift_moveMouse(_ dx: Double, _ dy: Double) {
     let currentEvent = CGEvent(source: nil)
     guard let currentLoc = currentEvent?.location else { return }
@@ -179,12 +185,14 @@ public func swift_moveMouse(_ dx: Double, _ dy: Double) {
 }
 
 @_cdecl("swift_scrollMouse")
+// swift_scrollMouse is undocumented. Please add documentation.
 public func swift_scrollMouse(_ dy: Int32, _ dx: Int32) {
     let scrollEvent = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 2, wheel1: dy, wheel2: dx, wheel3: 0)
     scrollEvent?.post(tap: .cghidEventTap)
 }
 
 @_cdecl("swift_clickMouse")
+// swift_clickMouse is undocumented. Please add documentation.
 public func swift_clickMouse(_ right: Bool) {
     let currentEvent = CGEvent(source: nil)
     let currentLoc = currentEvent?.location ?? CGPoint.zero
@@ -200,6 +208,7 @@ public func swift_clickMouse(_ right: Bool) {
 }
 
 @_cdecl("swift_mouseDown")
+// swift_mouseDown is undocumented. Please add documentation.
 public func swift_mouseDown(_ right: Bool) {
     let currentEvent = CGEvent(source: nil)
     let currentLoc = currentEvent?.location ?? CGPoint.zero
@@ -212,6 +221,7 @@ public func swift_mouseDown(_ right: Bool) {
 }
 
 @_cdecl("swift_mouseUp")
+// swift_mouseUp is undocumented. Please add documentation.
 public func swift_mouseUp(_ right: Bool) {
     let currentEvent = CGEvent(source: nil)
     let currentLoc = currentEvent?.location ?? CGPoint.zero
@@ -223,6 +233,7 @@ public func swift_mouseUp(_ right: Bool) {
 }
 
 @_cdecl("swift_typeText")
+// swift_typeText is undocumented. Please add documentation.
 public func swift_typeText(_ cText: UnsafePointer<CChar>) {
     let text = String(cString: cText)
     let str = text as NSString
@@ -239,6 +250,7 @@ public func swift_typeText(_ cText: UnsafePointer<CChar>) {
 }
 
 @_cdecl("swift_pressKey")
+// swift_pressKey is undocumented. Please add documentation.
 public func swift_pressKey(_ keyCode: UInt16) {
     let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(keyCode), keyDown: true)
     let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(keyCode), keyDown: false)
@@ -249,6 +261,7 @@ public func swift_pressKey(_ keyCode: UInt16) {
 import CoreAudio
 
 @_cdecl("swift_getVolume")
+// swift_getVolume is undocumented. Please add documentation.
 public func swift_getVolume() -> Float32 {
     var defaultOutputDeviceID = AudioDeviceID(0)
     var defaultOutputDeviceIDSize = UInt32(MemoryLayout.size(ofValue: defaultOutputDeviceID))
@@ -295,6 +308,7 @@ public func swift_getVolume() -> Float32 {
 }
 
 @_cdecl("swift_setVolume")
+// swift_setVolume is undocumented. Please add documentation.
 public func swift_setVolume(_ vol: Float32) {
     var defaultOutputDeviceID = AudioDeviceID(0)
     var defaultOutputDeviceIDSize = UInt32(MemoryLayout.size(ofValue: defaultOutputDeviceID))
@@ -339,6 +353,7 @@ public func swift_setVolume(_ vol: Float32) {
 }
 
 @_cdecl("swift_setMute")
+// swift_setMute is undocumented. Please add documentation.
 public func swift_setMute() {
     var defaultOutputDeviceID = AudioDeviceID(0)
     var defaultOutputDeviceIDSize = UInt32(MemoryLayout.size(ofValue: defaultOutputDeviceID))
@@ -384,6 +399,7 @@ public func swift_setMute() {
 // --- App Switcher & Dock Access ---
 
 @_cdecl("swift_showDock")
+// swift_showDock is undocumented. Please add documentation.
 public func swift_showDock() {
     let script = "tell application \"System Events\" to key code 99 using control down"
     var error: NSDictionary?
@@ -393,6 +409,7 @@ public func swift_showDock() {
 }
 
 @_cdecl("swift_isTextInputFocused")
+// swift_isTextInputFocused is undocumented. Please add documentation.
 public func swift_isTextInputFocused() -> Bool {
     let systemWideElement = AXUIElementCreateSystemWide()
     var focusedElement: CFTypeRef?
@@ -409,6 +426,7 @@ public func swift_isTextInputFocused() -> Bool {
 }
 
 @_cdecl("swift_switchToApp")
+// swift_switchToApp is undocumented. Please add documentation.
 public func swift_switchToApp(_ pid: Int32) {
     if let app = NSRunningApplication(processIdentifier: pid) {
         app.activate(options: .activateIgnoringOtherApps)
@@ -416,6 +434,7 @@ public func swift_switchToApp(_ pid: Int32) {
 }
 
 @_cdecl("swift_getRunningAppsHash")
+// swift_getRunningAppsHash is undocumented. Please add documentation.
 public func swift_getRunningAppsHash() -> UnsafeMutablePointer<CChar>? {
     let apps = NSWorkspace.shared.runningApplications
     let pids = apps.filter { $0.activationPolicy == .regular }.map { String($0.processIdentifier) }.joined(separator: ",")
@@ -423,6 +442,7 @@ public func swift_getRunningAppsHash() -> UnsafeMutablePointer<CChar>? {
 }
 
 @_cdecl("swift_getRunningAppsJSON")
+// swift_getRunningAppsJSON is undocumented. Please add documentation.
 public func swift_getRunningAppsJSON() -> UnsafeMutablePointer<CChar>? {
     let apps = NSWorkspace.shared.runningApplications
     let regularApps = apps.filter { $0.activationPolicy == .regular }
@@ -460,10 +480,12 @@ public func swift_getRunningAppsJSON() -> UnsafeMutablePointer<CChar>? {
 
 // --- Pairing UI ---
 
+// QRWindowController is undocumented. Please add documentation.
 class QRWindowController: NSObject, NSWindowDelegate {
     static let shared = QRWindowController()
     var window: NSWindow?
     
+// show is undocumented. Please add documentation.
     func show(url: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 320),
@@ -502,6 +524,7 @@ class QRWindowController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
+// generateQR is undocumented. Please add documentation.
     func generateQR(text: String) -> NSImage? {
         let data = text.data(using: String.Encoding.ascii)
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
@@ -519,16 +542,19 @@ class QRWindowController: NSObject, NSWindowDelegate {
         return nil
     }
     
+// close is undocumented. Please add documentation.
     func close() {
         window?.close()
         window = nil
     }
     
+// windowWillClose is undocumented. Please add documentation.
     func windowWillClose(_ notification: Notification) {
         window = nil
     }
 }
 
+// CodeWindowController is undocumented. Please add documentation.
 class CodeWindowController: NSObject, NSWindowDelegate {
     static let shared = CodeWindowController()
     var window: NSWindow?
@@ -536,6 +562,7 @@ class CodeWindowController: NSObject, NSWindowDelegate {
     var countdownLabel: NSTextField!
     var remainingSeconds = 60
     
+// show is undocumented. Please add documentation.
     func show(code: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
@@ -599,6 +626,7 @@ class CodeWindowController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
+// close is undocumented. Please add documentation.
     func close() {
         timer?.invalidate()
         timer = nil
@@ -606,6 +634,7 @@ class CodeWindowController: NSObject, NSWindowDelegate {
         window = nil
     }
     
+// windowWillClose is undocumented. Please add documentation.
     func windowWillClose(_ notification: Notification) {
         timer?.invalidate()
         timer = nil
@@ -613,10 +642,12 @@ class CodeWindowController: NSObject, NSWindowDelegate {
     }
 }
 
+// SuccessWindowController is undocumented. Please add documentation.
 class SuccessWindowController: NSObject, NSWindowDelegate {
     static let shared = SuccessWindowController()
     var window: NSWindow?
     
+// show is undocumented. Please add documentation.
     func show(clientInfo: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 350, height: 80),
@@ -663,6 +694,7 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
 }
 
 @_cdecl("swift_showQRUI")
+// swift_showQRUI is undocumented. Please add documentation.
 public func swift_showQRUI(_ qrURLStr: UnsafePointer<CChar>) {
     let qrURL = String(cString: qrURLStr)
     DispatchQueue.main.async {
@@ -671,6 +703,7 @@ public func swift_showQRUI(_ qrURLStr: UnsafePointer<CChar>) {
 }
 
 @_cdecl("swift_closeQRUI")
+// swift_closeQRUI is undocumented. Please add documentation.
 public func swift_closeQRUI() {
     DispatchQueue.main.async {
         QRWindowController.shared.close()
@@ -678,6 +711,7 @@ public func swift_closeQRUI() {
 }
 
 @_cdecl("swift_showCodeUI")
+// swift_showCodeUI is undocumented. Please add documentation.
 public func swift_showCodeUI(_ codeStr: UnsafePointer<CChar>) {
     let code = String(cString: codeStr)
     DispatchQueue.main.async {
@@ -686,6 +720,7 @@ public func swift_showCodeUI(_ codeStr: UnsafePointer<CChar>) {
 }
 
 @_cdecl("swift_closeCodeUI")
+// swift_closeCodeUI is undocumented. Please add documentation.
 public func swift_closeCodeUI() {
     DispatchQueue.main.async {
         CodeWindowController.shared.close()
@@ -693,6 +728,7 @@ public func swift_closeCodeUI() {
 }
 
 @_cdecl("swift_showSuccessUI")
+// swift_showSuccessUI is undocumented. Please add documentation.
 public func swift_showSuccessUI(_ clientInfoStr: UnsafePointer<CChar>) {
     let info = String(cString: clientInfoStr)
     DispatchQueue.main.async {
