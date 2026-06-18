@@ -12,6 +12,7 @@ Mac Remote skips the phone side install. The server renders its own UI as a web 
 
 ## Features
 
+- **Two-Way Synchronization**: If you change the volume, brightness, or media playback directly on your Mac, the web UI instantly updates to reflect the new values.
 - **Brightness & volume control**, with the current value shown as a number.  
   <img src="screenshots/brightness-vol.png" width="260" alt="Brightness and Volume controls" />
 
