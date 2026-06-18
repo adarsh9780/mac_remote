@@ -78,10 +78,17 @@ Mac Remote is designed to operate on your local area network (LAN). It uses the 
 
 ### Method 1: Homebrew (Recommended)
 
-You can easily install MacRemote using Homebrew by tapping this repository:
+You can easily install MacRemote using Homebrew. Since the Cask is hosted directly in this repository rather than a dedicated Homebrew tap, you need to explicitly provide the repository URL:
 
 ```bash
-brew install adarsh9780/mac_remote/macremote
+# Tap the repository
+brew tap adarsh9780/mac_remote https://github.com/adarsh9780/mac_remote
+
+# Trust the custom tap (Homebrew requires this for third-party taps)
+brew trust adarsh9780/mac_remote
+
+# Install MacRemote
+brew install macremote
 ```
 
 > **Developer Signature Transparency**
