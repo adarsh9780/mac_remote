@@ -84,3 +84,65 @@ func TestRequestHandler_AcceptsTraffic(t *testing.T) {
 		t.Errorf("Expected 200 OK, got %v", status)
 	}
 }
+
+func TestMiddleware_ActiveSession_BlocksNewConnections(t *testing.T) {
+	// Setup an active session
+	authMutex.Lock()
+	authSessions = make(map[string]*ConnectedDevice)
+	authSessions["dummy_token"] = &ConnectedDevice{Name: "Test Device"}
+	authMutex.Unlock()
+
+	defer func() {
+		authMutex.Lock()
+		authSessions = make(map[string]*ConnectedDevice)
+		authMutex.Unlock()
+	}()
+
+	req, _ := http.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+	
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	
+	handler := authMiddleware(mux)
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusFound {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusFound)
+	}
+	if loc := rr.Header().Get("Location"); loc != "/busy.html" {
+		t.Errorf("Expected redirect to /busy.html, got %s", loc)
+	}
+}
+
+func TestMiddleware_ActiveSession_AllowsValidCookie(t *testing.T) {
+	// Setup an active session
+	authMutex.Lock()
+	authSessions = make(map[string]*ConnectedDevice)
+	authSessions["dummy_token"] = &ConnectedDevice{Name: "Test Device"}
+	authMutex.Unlock()
+
+	defer func() {
+		authMutex.Lock()
+		authSessions = make(map[string]*ConnectedDevice)
+		authMutex.Unlock()
+	}()
+
+	req, _ := http.NewRequest("GET", "/", nil)
+	req.AddCookie(&http.Cookie{Name: "macremote_session", Value: "dummy_token"})
+	rr := httptest.NewRecorder()
+	
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	
+	handler := authMiddleware(mux)
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+}
