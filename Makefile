@@ -1,4 +1,12 @@
 build:
+	# Create app bundle directories
+	mkdir -p MacRemote.app/Contents/MacOS
+	mkdir -p MacRemote.app/Contents/Resources
+	
+	# Copy Info.plist and AppIcon.icns into the bundle
+	cp packaging/Info.plist MacRemote.app/Contents/Info.plist
+	cp packaging/AppIcon.icns MacRemote.app/Contents/Resources/AppIcon.icns
+	
 	# Compile Swift code into an object file (no executable)
 	swiftc -parse-as-library -O -c system_helper.swift -o go/system_helper.o
 	
