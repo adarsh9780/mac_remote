@@ -1,22 +1,29 @@
 # MacRemote
 
-MacRemote is an open-source, highly-responsive, and secure local application that allows you to control your Mac directly from your iPhone, Android, or any modern web browser.
+MacRemote is an open-source local application that allows you to control your Mac directly from your iPhone, Android, or any modern web browser.
 
-It leverages a native macOS menu bar app written in Swift and Go, serving a beautiful, hacker-themed, mobile-first web interface to devices on your local network.
+It leverages a native macOS menu bar app written in Swift and Go, serving a mobile-first web interface to devices on your local network.
 
 ![UI Screenshot](screenshot.png)
 
+## Why MacRemote?
+With thousands of remote control apps on the App Store, why build another one?
+- **Zero Client Installation**: Since the remote interface is a web application served from your Mac, you don't need to install anything on your phone. Any device with a modern browser works instantly.
+- **Privacy & Local First**: There are no cloud dependencies, account signups, or external servers routing your inputs. Everything runs strictly on your local network.
+- **No Ads or Paywalls**: Completely free and open-source. No hidden premium tiers, subscriptions, or tracking.
+- **Native macOS Integration**: Built directly with native macOS Accessibility (AXUIElement) APIs and AppleScript for seamless, reliable control of the system.
+
 ## Features
-- **Giant Trackpad**: Fluid, low-latency mouse control over your local network using Server-Sent Events (SSE).
+- **Trackpad**: Mouse control over your local network using Server-Sent Events (SSE).
 - **Media Controls**: Adjust volume, brightness, play/pause, and skip tracks.
-- **Secure Pairing Flow**: Device connections require scanning a QR Code from the Mac Menu Bar and entering a live-generated 6-digit OTP code. Unauthenticated traffic is rejected.
+- **Pairing Flow**: Device connections require scanning a QR Code from the Mac Menu Bar and entering a live-generated 6-digit OTP code. Unauthenticated traffic is rejected.
 - **Device Management**: View and disconnect active devices directly from the Mac Menu Bar.
 - **App Switcher**: See running applications and seamlessly switch between them using the built-in dock UI.
 - **Accessibility & Keyboard**: Integrated virtual keyboard that triggers natively on your Mac.
 
 ## Architecture
 This project is built using two core technologies:
-1. **Go (Golang)**: Powers the ultra-fast HTTP web server, the SSE streams for trackpad data, and the secure pairing session logic.
+1. **Go (Golang)**: Powers the HTTP web server, the SSE streams for trackpad data, and the pairing session logic.
 2. **Swift**: Provides the native macOS APIs for Accessibility (AXUIElement), media controls, AppleScript execution, and the Menu Bar UI (using `systray`). The Go server interfaces with Swift via Cgo.
 
 ## Setup & Compilation
@@ -55,4 +62,4 @@ make test
 ```
 
 ## Security
-MacRemote is designed to only operate on your local area network (LAN). It utilizes HTTP-only cookies and robust brute-force protection (lockout after 5 failed OTP attempts). Sessions are valid for 1 year but can be revoked at any time from the Mac Menu Bar.
+MacRemote is designed to only operate on your local area network (LAN). It utilizes HTTP-only cookies and brute-force protection (lockout after 5 failed OTP attempts). Sessions are valid for 1 year but can be revoked at any time from the Mac Menu Bar.
