@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          
+      - name: Run Tests
+        run: make test
+
+      - name: Build Application
+        run: make build
+
+      - name: Package into DMG
+        run: |
+          # Create a DMG file from the MacRemote.app bundle
+          # -volname: The name of the mounted volume
+          # -srcfolder: The source directory to package
+          # -ov: Overwrite if exists
+          # -format UDZO: Compressed DMG format
+          hdiutil create -volname "MacRemote" -srcfolder MacRemote.app -ov -format UDZO MacRemote.dmg
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: MacRemote.dmg
+          generate_release_notes: true
