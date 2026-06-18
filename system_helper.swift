@@ -498,6 +498,7 @@ func applyUnifiedTheme(to win: NSWindow, contentView view: NSView, cornerRadius:
     effectView.material = .hudWindow
     effectView.blendingMode = .behindWindow
     effectView.state = .active
+    effectView.appearance = NSAppearance(named: .vibrantDark)
     
     if cornerRadius > 0 {
         effectView.wantsLayer = true
@@ -533,6 +534,8 @@ class OSDWindowController: NSObject, NSWindowDelegate {
                     win.setFrameOrigin(NSPoint(x: screen.frame.midX - 100, y: 140))
                 }
                 win.isReleasedWhenClosed = false
+                win.level = .floating
+                win.ignoresMouseEvents = true
                 win.delegate = self
                 
                 let view = NSView(frame: win.contentView!.bounds)
@@ -592,6 +595,7 @@ class QRWindowController: NSObject, NSWindowDelegate {
             win.title = "MacRemote QR Code"
             win.titlebarAppearsTransparent = true
             win.center()
+            win.level = .floating
             win.isReleasedWhenClosed = false
             win.delegate = self
             
@@ -671,6 +675,7 @@ class CodeWindowController: NSObject, NSWindowDelegate {
             win.title = "Connection Request"
             win.titlebarAppearsTransparent = true
             win.center()
+            win.level = .floating
             win.isReleasedWhenClosed = false
             win.delegate = self
             
@@ -763,7 +768,9 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
                                styleMask: [.borderless],
                                backing: .buffered, defer: false)
             win.center()
+            win.level = .floating
             win.isReleasedWhenClosed = false
+            win.ignoresMouseEvents = true
             win.delegate = self
             
             let view = NSView(frame: win.contentView!.bounds)
