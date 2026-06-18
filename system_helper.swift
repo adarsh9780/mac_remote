@@ -572,7 +572,7 @@ class OSDWindowController: NSObject, NSWindowDelegate {
             }
             
             self.window?.alphaValue = 1.0
-            self.window?.makeKeyAndOrderFront(nil)
+            self.window?.orderFrontRegardless()
             
             self.timer?.invalidate()
             self.timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
@@ -802,7 +802,7 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
         }
         
         window?.alphaValue = 1.0
-        window?.makeKeyAndOrderFront(nil)
+        window?.orderFrontRegardless()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             NSAnimationContext.runAnimationGroup({ context in
