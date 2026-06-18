@@ -98,6 +98,12 @@ open MacRemote.app
 
 Once running, click the menu bar icon and choose "Show QR Code", scan it with your phone, and enter the connection request code displayed on your Mac screen.
 
+## Security Considerations
+
+- **Local Network Only**: MacRemote strictly operates on your local Wi-Fi network and does not route traffic through external servers. 
+- **HTTP Transport**: Currently, MacRemote uses standard, unencrypted HTTP. Because the app is designed to be used safely within the confines of a trusted home Wi-Fi network, this provides a frictionless, warning-free user experience. However, if used on public or untrusted Wi-Fi (like a coffee shop), the connection could theoretically be intercepted.
+- **Intentional Omission of HTTPS**: We have intentionally decided *not* to implement HTTPS for this local transport. Securing local IP addresses (`192.168.x.x`) requires self-signed certificates, which trigger severe and scary "This Connection Is Not Private" warnings in modern mobile browsers. Bypassing these warnings ruins the premium user experience, so we have chosen to rely on the inherent security of your private home network instead.
+
 ## Roadmap
 
 - [x] One-time-code pairing with expiry
@@ -105,7 +111,6 @@ Once running, click the menu bar icon and choose "Show QR Code", scan it with yo
 - [x] Per-device session list with revoke
 - [x] Textured/dotted trackpad surface
 - [x] Connection limit (cap on simultaneous connected devices)
-- [ ] HTTPS / encrypted local transport
 
 ## Contributing
 
