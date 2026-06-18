@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pair MacRemote</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #000;
+            color: var(--text-main);
+            font-family: -apple-system, sans-serif;
+            text-align: center;
+        }
+        .container {
+            background: #111114;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #1a1a1d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            width: 90%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-top: 0;
+            color: var(--accent-glow);
+        }
+        p {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            background: #08080a;
+            border: 1px solid #1a1a1d;
+            color: var(--text-main);
+            font-size: 24px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            letter-spacing: 5px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: var(--accent-glow);
+        }
+        .error {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 15px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Pair Device</h2>
+        <p>Enter the 6-digit code shown on your Mac.</p>
+        <input type="text" id="codeInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="000000" autofocus>
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <script>
+        const input = document.getElementById('codeInput');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Request Mac to show pairing code on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await fetch('/api/pair/request', { method: 'POST' });
+            } catch (err) {
+                console.error("Failed to request code", err);
+            }
+        });
+
+        // Parse query params for errors
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error')) {
+            errorMsg.innerText = "Invalid or expired QR code.";
+        }
+
+        input.addEventListener('input', async (e) => {
+            errorMsg.innerText = "";
+            let val = input.value.replace(/[^0-9]/g, '');
+            if (val.length > 6) val = val.substring(0, 6);
+            input.value = val;
+
+            if (val.length === 6) {
+                input.disabled = true;
+                try {
+                    const res = await fetch('/api/pair/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: val })
+                    });
+                    
+                    if (res.ok) {
+                        window.location.href = '/';
+                    } else {
+                        input.disabled = false;
+                        input.value = '';
+                        input.focus();
+                        errorMsg.innerText = "Invalid or expired code.";
+                    }
+                } catch (err) {
+                    input.disabled = false;
+                    input.value = '';
+                    errorMsg.innerText = "Connection error.";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
