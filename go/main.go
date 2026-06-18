@@ -292,7 +292,10 @@ func handlePairRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := pair.Generate(60*time.Second, nil)
+	session := pair.GetActiveIfValid(nil)
+	if session == nil {
+		session = pair.Generate(60*time.Second, nil)
+	}
 	swiftCloseQRUI()
 	swiftShowCodeUI(session.Code)
 	

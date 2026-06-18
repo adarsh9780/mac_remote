@@ -2,6 +2,7 @@ package pair
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/base64"
 	"math/big"
 	"sync"
@@ -48,17 +49,43 @@ func Generate(ttl time.Duration, clock func() time.Time) *Session {
 	return &cpy
 }
 
+// GetActiveIfValid returns the active session if it is unexpired and unconsumed.
+// Otherwise returns nil.
+func GetActiveIfValid(clock func() time.Time) *Session {
+	sessionMutex.Lock()
+	defer sessionMutex.Unlock()
+
+	if clock == nil {
+		clock = time.Now
+	}
+
+	if activeSession == nil {
+		return nil
+	}
+
+	if activeSession.Consumed {
+		return nil
+	}
+
+	if clock().After(activeSession.ExpiresAt) {
+		return nil
+	}
+
+	cpy := *activeSession
+	return &cpy
+}
+
 // VerifyCode verifies a 6-digit code.
 func VerifyCode(code string, clock func() time.Time) bool {
 	return verify(func(s *Session) bool {
-		return s.Code == code
+		return subtle.ConstantTimeCompare([]byte(s.Code), []byte(code)) == 1
 	}, clock)
 }
 
 // VerifyToken verifies a URL token.
 func VerifyToken(token string, clock func() time.Time) bool {
 	return verify(func(s *Session) bool {
-		return s.Token == token
+		return subtle.ConstantTimeCompare([]byte(s.Token), []byte(token)) == 1
 	}, clock)
 }
 

@@ -72,7 +72,7 @@ Mac Remote is designed to operate on your local area network (LAN). It uses the 
 
 - **QR-code & One-time-code pairing**: An on-screen 6-digit one-time code is required before a new device gets control.
 - **Brute-force protection**: Automatic lockout after 5 failed OTP attempts.
-- **Device Management**: A list of currently connected devices is visible in the Mac menu bar. You can instantly revoke access for any of them.
+- **Device Management**: MacRemote enforces exactly one connected device at a time. You can instantly disconnect the active user from the Mac menu bar to securely allow a new pairing.
 
 ## Installation
 
