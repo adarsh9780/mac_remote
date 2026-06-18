@@ -33,6 +33,10 @@ public func swift_setBrightness(_ val: Float) {
           let sym = dlsym(handle, "DisplayServicesSetBrightness") else { return }
     let SetBrightness = unsafeBitCast(sym, to: SetBrightnessType.self)
     _ = SetBrightness(CGMainDisplayID(), val)
+    
+    DispatchQueue.main.async {
+        OSDWindowController.shared.show(type: .brightness, value: val)
+    }
 }
 
 @_cdecl("swift_initMediaRemote")
@@ -350,6 +354,10 @@ public func swift_setVolume(_ vol: Float32) {
             volumeSize,
             &volume)
     }
+    
+    DispatchQueue.main.async {
+        OSDWindowController.shared.show(type: .volume, value: vol)
+    }
 }
 
 @_cdecl("swift_setMute")
@@ -478,20 +486,111 @@ public func swift_getRunningAppsJSON() -> UnsafeMutablePointer<CChar>? {
     return strdup(result)
 }
 
-// --- Pairing UI ---
+// --- Pairing UI & OSD ---
 
-// QRWindowController is undocumented. Please add documentation.
+func applyUnifiedTheme(to win: NSWindow, contentView view: NSView, cornerRadius: CGFloat = 0) {
+    win.backgroundColor = .clear
+    win.isOpaque = false
+    win.hasShadow = true
+    
+    let effectView = NSVisualEffectView(frame: view.bounds)
+    effectView.autoresizingMask = [.width, .height]
+    effectView.material = .hudWindow
+    effectView.blendingMode = .behindWindow
+    effectView.state = .active
+    
+    if cornerRadius > 0 {
+        effectView.wantsLayer = true
+        effectView.layer?.cornerRadius = cornerRadius
+        effectView.layer?.masksToBounds = true
+        // For the window itself to be clear and shadow to wrap the shape:
+        win.backgroundColor = .clear
+    }
+    
+    view.addSubview(effectView, positioned: .below, relativeTo: nil)
+}
+
+enum OSDType {
+    case volume
+    case brightness
+}
+
+class OSDWindowController: NSObject, NSWindowDelegate {
+    static let shared = OSDWindowController()
+    var window: NSWindow?
+    var timer: Timer?
+    var progressBar: NSLevelIndicator!
+    var iconView: NSImageView!
+    
+    func show(type: OSDType, value: Float) {
+        DispatchQueue.main.async {
+            if self.window == nil {
+                let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 200, height: 200),
+                                   styleMask: [.borderless],
+                                   backing: .buffered, defer: false)
+                win.center()
+                if let screen = NSScreen.main {
+                    win.setFrameOrigin(NSPoint(x: screen.frame.midX - 100, y: 140))
+                }
+                win.isReleasedWhenClosed = false
+                win.delegate = self
+                
+                let view = NSView(frame: win.contentView!.bounds)
+                win.contentView = view
+                
+                applyUnifiedTheme(to: win, contentView: view, cornerRadius: 18)
+                
+                self.iconView = NSImageView(frame: NSRect(x: 60, y: 80, width: 80, height: 80))
+                self.iconView.contentTintColor = .white
+                self.iconView.imageScaling = .scaleProportionallyUpOrDown
+                view.addSubview(self.iconView)
+                
+                self.progressBar = NSLevelIndicator(frame: NSRect(x: 20, y: 30, width: 160, height: 16))
+                self.progressBar.levelIndicatorStyle = .continuousCapacity
+                self.progressBar.minValue = 0
+                self.progressBar.maxValue = 100
+                view.addSubview(self.progressBar)
+                
+                self.window = win
+            }
+            
+            self.progressBar.doubleValue = Double(value * 100)
+            
+            if type == .volume {
+                let name = value > 0.66 ? "speaker.wave.3.fill" : (value > 0.33 ? "speaker.wave.2.fill" : (value > 0 ? "speaker.wave.1.fill" : "speaker.slash.fill"))
+                self.iconView.image = NSImage(systemSymbolName: name, accessibilityDescription: nil)
+            } else {
+                self.iconView.image = NSImage(systemSymbolName: "sun.max.fill", accessibilityDescription: nil)
+            }
+            
+            self.window?.alphaValue = 1.0
+            self.window?.makeKeyAndOrderFront(nil)
+            
+            self.timer?.invalidate()
+            self.timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+                NSAnimationContext.runAnimationGroup({ context in
+                    context.duration = 0.5
+                    self?.window?.animator().alphaValue = 0
+                }, completionHandler: {
+                    self?.window?.close()
+                    self?.window = nil
+                })
+            }
+        }
+    }
+}
+
 class QRWindowController: NSObject, NSWindowDelegate {
     static let shared = QRWindowController()
     var window: NSWindow?
     
-// show is undocumented. Please add documentation.
     func show(url: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 320),
-                               styleMask: [.titled, .closable],
+                               styleMask: [.titled, .closable, .fullSizeContentView],
                                backing: .buffered, defer: false)
             win.title = "MacRemote QR Code"
+            win.titlebarAppearsTransparent = true
             win.center()
             win.isReleasedWhenClosed = false
             win.delegate = self
@@ -499,9 +598,15 @@ class QRWindowController: NSObject, NSWindowDelegate {
             let view = NSView(frame: win.contentView!.bounds)
             win.contentView = view
             
+            applyUnifiedTheme(to: win, contentView: view)
+            
             let label = NSTextField(labelWithString: "Scan to Connect")
             label.font = NSFont.systemFont(ofSize: 20, weight: .semibold)
+            label.textColor = .white
             label.alignment = .center
+            label.isEditable = false
+            label.isBordered = false
+            label.drawsBackground = false
             label.frame = NSRect(x: 20, y: 260, width: 260, height: 30)
             view.addSubview(label)
             
@@ -524,7 +629,6 @@ class QRWindowController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
-// generateQR is undocumented. Please add documentation.
     func generateQR(text: String) -> NSImage? {
         let data = text.data(using: String.Encoding.ascii)
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
@@ -542,19 +646,16 @@ class QRWindowController: NSObject, NSWindowDelegate {
         return nil
     }
     
-// close is undocumented. Please add documentation.
     func close() {
         window?.close()
         window = nil
     }
     
-// windowWillClose is undocumented. Please add documentation.
     func windowWillClose(_ notification: Notification) {
         window = nil
     }
 }
 
-// CodeWindowController is undocumented. Please add documentation.
 class CodeWindowController: NSObject, NSWindowDelegate {
     static let shared = CodeWindowController()
     var window: NSWindow?
@@ -562,13 +663,13 @@ class CodeWindowController: NSObject, NSWindowDelegate {
     var countdownLabel: NSTextField!
     var remainingSeconds = 60
     
-// show is undocumented. Please add documentation.
     func show(code: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
-                               styleMask: [.titled, .closable],
+                               styleMask: [.titled, .closable, .fullSizeContentView],
                                backing: .buffered, defer: false)
             win.title = "Connection Request"
+            win.titlebarAppearsTransparent = true
             win.center()
             win.isReleasedWhenClosed = false
             win.delegate = self
@@ -576,15 +677,25 @@ class CodeWindowController: NSObject, NSWindowDelegate {
             let view = NSView(frame: win.contentView!.bounds)
             win.contentView = view
             
+            applyUnifiedTheme(to: win, contentView: view)
+            
             let titleLabel = NSTextField(labelWithString: "Enter code on your phone:")
             titleLabel.font = NSFont.systemFont(ofSize: 14)
+            titleLabel.textColor = .white
             titleLabel.alignment = .center
+            titleLabel.isEditable = false
+            titleLabel.isBordered = false
+            titleLabel.drawsBackground = false
             titleLabel.frame = NSRect(x: 20, y: 140, width: 260, height: 30)
             view.addSubview(titleLabel)
             
             let codeLabel = NSTextField(labelWithString: code)
             codeLabel.font = NSFont.monospacedDigitSystemFont(ofSize: 48, weight: .bold)
+            codeLabel.textColor = .white
             codeLabel.alignment = .center
+            codeLabel.isEditable = false
+            codeLabel.isBordered = false
+            codeLabel.drawsBackground = false
             codeLabel.frame = NSRect(x: 20, y: 60, width: 260, height: 70)
             view.addSubview(codeLabel)
             
@@ -592,12 +703,14 @@ class CodeWindowController: NSObject, NSWindowDelegate {
             countdownLabel.font = NSFont.systemFont(ofSize: 14)
             countdownLabel.textColor = .systemRed
             countdownLabel.alignment = .center
+            countdownLabel.isEditable = false
+            countdownLabel.isBordered = false
+            countdownLabel.drawsBackground = false
             countdownLabel.frame = NSRect(x: 20, y: 20, width: 260, height: 30)
             view.addSubview(countdownLabel)
             
             self.window = win
         } else {
-            // Update existing window
             if let view = window?.contentView {
                 if let codeLabel = view.subviews.first(where: { $0 is NSTextField && ($0 as! NSTextField).font?.pointSize == 48 }) as? NSTextField {
                     codeLabel.stringValue = code
@@ -626,7 +739,6 @@ class CodeWindowController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
-// close is undocumented. Please add documentation.
     func close() {
         timer?.invalidate()
         timer = nil
@@ -634,7 +746,6 @@ class CodeWindowController: NSObject, NSWindowDelegate {
         window = nil
     }
     
-// windowWillClose is undocumented. Please add documentation.
     func windowWillClose(_ notification: Notification) {
         timer?.invalidate()
         timer = nil
@@ -642,12 +753,10 @@ class CodeWindowController: NSObject, NSWindowDelegate {
     }
 }
 
-// SuccessWindowController is undocumented. Please add documentation.
 class SuccessWindowController: NSObject, NSWindowDelegate {
     static let shared = SuccessWindowController()
     var window: NSWindow?
     
-// show is undocumented. Please add documentation.
     func show(clientInfo: String) {
         if window == nil {
             let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 350, height: 80),
@@ -656,17 +765,19 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
             win.center()
             win.isReleasedWhenClosed = false
             win.delegate = self
-            win.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.9)
-            win.isOpaque = false
-            win.hasShadow = true
             
             let view = NSView(frame: win.contentView!.bounds)
             win.contentView = view
+            
+            applyUnifiedTheme(to: win, contentView: view, cornerRadius: 12)
             
             let label = NSTextField(labelWithString: "Successfully Connected:\n\(clientInfo)")
             label.font = NSFont.systemFont(ofSize: 14, weight: .medium)
             label.alignment = .center
             label.textColor = .systemGreen
+            label.isEditable = false
+            label.isBordered = false
+            label.drawsBackground = false
             label.frame = NSRect(x: 20, y: 15, width: 310, height: 50)
             view.addSubview(label)
             
@@ -678,9 +789,9 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
             }
         }
         
+        window?.alphaValue = 1.0
         window?.makeKeyAndOrderFront(nil)
         
-        // Auto fade out
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             NSAnimationContext.runAnimationGroup({ context in
                 context.duration = 0.5
@@ -694,7 +805,6 @@ class SuccessWindowController: NSObject, NSWindowDelegate {
 }
 
 @_cdecl("swift_showQRUI")
-// swift_showQRUI is undocumented. Please add documentation.
 public func swift_showQRUI(_ qrURLStr: UnsafePointer<CChar>) {
     let qrURL = String(cString: qrURLStr)
     DispatchQueue.main.async {
@@ -703,7 +813,6 @@ public func swift_showQRUI(_ qrURLStr: UnsafePointer<CChar>) {
 }
 
 @_cdecl("swift_closeQRUI")
-// swift_closeQRUI is undocumented. Please add documentation.
 public func swift_closeQRUI() {
     DispatchQueue.main.async {
         QRWindowController.shared.close()
@@ -711,7 +820,6 @@ public func swift_closeQRUI() {
 }
 
 @_cdecl("swift_showCodeUI")
-// swift_showCodeUI is undocumented. Please add documentation.
 public func swift_showCodeUI(_ codeStr: UnsafePointer<CChar>) {
     let code = String(cString: codeStr)
     DispatchQueue.main.async {
@@ -720,7 +828,6 @@ public func swift_showCodeUI(_ codeStr: UnsafePointer<CChar>) {
 }
 
 @_cdecl("swift_closeCodeUI")
-// swift_closeCodeUI is undocumented. Please add documentation.
 public func swift_closeCodeUI() {
     DispatchQueue.main.async {
         CodeWindowController.shared.close()
@@ -728,7 +835,6 @@ public func swift_closeCodeUI() {
 }
 
 @_cdecl("swift_showSuccessUI")
-// swift_showSuccessUI is undocumented. Please add documentation.
 public func swift_showSuccessUI(_ clientInfoStr: UnsafePointer<CChar>) {
     let info = String(cString: clientInfoStr)
     DispatchQueue.main.async {
