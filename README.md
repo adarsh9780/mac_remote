@@ -104,7 +104,7 @@ Once running, click the menu bar icon and choose "Show QR Code", scan it with yo
 - [x] QR-code pairing
 - [x] Per-device session list with revoke
 - [x] Textured/dotted trackpad surface
-- [ ] Connection limit (cap on simultaneous connected devices)
+- [x] Connection limit (cap on simultaneous connected devices)
 - [ ] HTTPS / encrypted local transport
 
 ## Contributing
