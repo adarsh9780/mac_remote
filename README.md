@@ -12,21 +12,23 @@ Remote-control-your-computer apps have existed for over a decade, but almost all
 
 Mac Remote skips the phone-side install entirely. The server renders its own UI as a regular web page, so any phone, tablet, or laptop with a browser on the same network can use it immediately — including a friend's phone, a borrowed device, or a Mac mini you manage headlessly.
 
-## Screenshots
-
-<p>
-  <img src="screenshots/home-screen.png" width="260" alt="Main control screen: media playback, brightness, volume, and trackpad" />
-  <img src="screenshots/keyboard-input.png" width="260" alt="Keyboard screen for typing into the focused Mac text field" />
-  <img src="screenshots/app-switcher.png" width="260" alt="Remote app switcher / Dock view" />
-</p>
-
 ## Features
 
-- **Brightness & volume control**, with the current value shown live as a number, not just an icon.
-- **Media controls** (rewind, previous, play/pause, next, fast-forward) plus a scrolling "Now Playing" readout.
-- **Full trackpad** for cursor movement, with independently adjustable pointer sensitivity and scroll speed.
-- **Native keyboard typing** — when the Mac's cursor is in a text field, your phone's own keyboard types into it directly, including a dedicated "Send Enter" action so Return behaves correctly instead of inserting a literal newline.
-- **Remote app switcher / Dock view** — see what's running and launch or switch to any app from your phone, plus a one-tap "Show Dock" shortcut.
+- **Brightness & volume control**, with the current value shown live as a number, not just an icon.  
+  <img src="screenshots/brightness-vol.png" width="260" alt="Brightness and Volume controls" />
+
+- **Media controls** (rewind, previous, play/pause, next, fast-forward) plus a scrolling "Now Playing" readout.  
+  <img src="screenshots/media-controls.png" width="260" alt="Expanded Media Controls" />
+
+- **Full trackpad** for cursor movement, with independently adjustable pointer sensitivity and scroll speed.  
+  <img src="screenshots/trackpad-settings.png" width="260" alt="Trackpad and Sensitivity Settings" />
+
+- **Native keyboard typing** — when the Mac's cursor is in a text field, your phone's own keyboard types into it directly, including a dedicated "Send Enter" action so Return behaves correctly instead of inserting a literal newline.  
+  <img src="screenshots/keyboard.png" width="260" alt="Virtual Keyboard" />
+
+- **Remote app switcher / Dock view** — see what's running and launch or switch to any app from your phone, plus a one-tap "Show Dock" shortcut.  
+  <img src="screenshots/app-switcher.png" width="260" alt="App Switcher" />
+
 - **Zero install on the client.** Works from Safari, Chrome, or any mobile browser — nothing to approve, download, or keep updated on the phone side.
 - **Minimal footprint.** The whole app is about 9MB: a Go server handling the web UI and logic, with a single, statically-linked Swift object for the macOS-specific calls (brightness, volume, window/app management) that Go can't reach directly. No Electron, no bundled browser runtime.
 
