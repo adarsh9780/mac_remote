@@ -234,30 +234,54 @@ func updateDeviceMenu(dev *ConnectedDevice) {
 // authMiddleware is undocumented. Please add documentation.
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Allow pairing and static assets
+		cookie, err := r.Cookie("macremote_session")
+		valid := false
+		hasActiveSession := false
+		
+		authMutex.Lock()
+		if err == nil {
+			_, valid = authSessions[cookie.Value]
+		}
+		hasActiveSession = len(authSessions) > 0
+		authMutex.Unlock()
+
+		// If the user has a valid session, let them through.
+		if valid {
+			if r.URL.Path == "/pair.html" || r.URL.Path == "/busy.html" {
+				http.Redirect(w, r, "/", http.StatusFound)
+				return
+			}
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// User is NOT authenticated.
+		// If another session is already active, block pairing!
+		if hasActiveSession {
+			if r.URL.Path == "/busy.html" || strings.HasSuffix(r.URL.Path, ".css") || strings.HasSuffix(r.URL.Path, ".js") {
+				next.ServeHTTP(w, r)
+				return
+			}
+			if strings.HasPrefix(r.URL.Path, "/api/") {
+				http.Error(w, `{"error": "Busy"}`, http.StatusForbidden)
+				return
+			}
+			http.Redirect(w, r, "/busy.html", http.StatusFound)
+			return
+		}
+
+		// No active sessions exist. Allow access to pairing pages and static assets.
 		if strings.HasPrefix(r.URL.Path, "/api/pair/") || r.URL.Path == "/pair" || r.URL.Path == "/pair.html" || strings.HasSuffix(r.URL.Path, ".css") || strings.HasSuffix(r.URL.Path, ".js") {
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		cookie, err := r.Cookie("macremote_session")
-		valid := false
-		if err == nil {
-			authMutex.Lock()
-			_, valid = authSessions[cookie.Value]
-			authMutex.Unlock()
+		// Not authenticated and hitting a protected route
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		} else {
+			http.Redirect(w, r, "/pair.html", http.StatusFound)
 		}
-
-		if !valid {
-			if strings.HasPrefix(r.URL.Path, "/api/") {
-				http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
-			} else {
-				http.Redirect(w, r, "/pair.html", http.StatusFound)
-			}
-			return
-		}
-
-		next.ServeHTTP(w, r)
 	})
 }
 

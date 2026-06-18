@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MacRemote Busy</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #000;
+            color: var(--text-main);
+            font-family: -apple-system, sans-serif;
+            text-align: center;
+        }
+        .container {
+            background: #111114;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #1a1a1d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            width: 90%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-top: 0;
+            color: var(--accent-glow);
+        }
+        p {
+            font-size: 15px;
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Connection Active</h2>
+        <p>A remote session is currently active. A new connection cannot be established.</p>
+        <p>Please contact the admin of the Mac to disconnect the active user from the menu bar if you need access.</p>
+    </div>
+</body>
+</html>
