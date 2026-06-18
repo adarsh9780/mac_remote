@@ -437,7 +437,12 @@ public func swift_isTextInputFocused() -> Bool {
 // swift_switchToApp is undocumented. Please add documentation.
 public func swift_switchToApp(_ pid: Int32) {
     if let app = NSRunningApplication(processIdentifier: pid) {
-        app.activate(options: .activateIgnoringOtherApps)
+        if #available(macOS 14.0, *) {
+            app.activate(options: .activateAllWindows)
+        } else {
+            // Fallback on earlier versions
+            app.activate(options: NSApplication.ActivationOptions(rawValue: 1 << 1)) // .activateIgnoringOtherApps rawValue
+        }
     }
 }
 
@@ -478,7 +483,7 @@ public func swift_getRunningAppsJSON() -> UnsafeMutablePointer<CChar>? {
             }
         }
         
-        let jsonStr = "{\"pid\":\(app.processIdentifier),\"name\":\"\(app.localizedName ?? "Unknown")\",\"icon\":\"\(base64Icon)\"}"
+        let jsonStr = "{\"pid\":\(pid),\"name\":\"\(name)\",\"icon\":\"\(base64Icon)\"}"
         jsonArray.append(jsonStr)
     }
     
