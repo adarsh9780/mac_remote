@@ -13,6 +13,7 @@ Mac Remote skips the phone side install. The server renders its own UI as a web 
 ## Features
 
 - **Two-Way Synchronization**: If you change the volume, brightness, or media playback directly on your Mac, the web UI instantly updates to reflect the new values.
+- **Single Connection Security**: To prevent unauthorized access, only one device can control the Mac at a time. If a new device attempts to connect, it will be securely blocked until the Mac admin explicitly disconnects the current user.
 - **Custom OSD Overlay**: When adjusting volume or brightness from your phone, MacRemote displays a beautiful, dark-translucent Heads-Up Display (HUD) on your Mac, seamlessly replacing the native widgets that macOS omits for background apps.
 - **Brightness & volume control**, with the current value shown as a number.  
   <img src="screenshots/brightness-vol.png" width="260" alt="Brightness and Volume controls" />
