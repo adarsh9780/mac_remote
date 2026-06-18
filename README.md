@@ -74,15 +74,30 @@ Mac Remote is designed to operate on your local area network (LAN). It uses the 
 - **Brute-force protection**: Automatic lockout after 5 failed OTP attempts.
 - **Device Management**: A list of currently connected devices is visible in the Mac menu bar. You can instantly revoke access for any of them.
 
-## Getting Started
+## Installation
 
-### Requirements
+### Method 1: Homebrew (Recommended)
+
+You can easily install MacRemote using Homebrew by tapping this repository:
+
+```bash
+brew install adarsh9780/mac_remote/macremote
+```
+
+> **Developer Signature Transparency**
+> Because MacRemote is a free and open-source project, we currently do not pay the $99/year Apple Developer fee required to cryptographically sign applications. If this project gains enough traction, we will purchase a license!
+> 
+> Until then, the Homebrew installer will display a pop-up asking if you want to trust the application. If you click **Yes**, the installer will automatically clear macOS Gatekeeper warnings and move the app to your `/Applications` folder.
+
+### Method 2: Build from Source
+
+If you prefer to compile the application yourself, you will need:
 - **macOS** 13.0 or later
 - **Go** 1.21+
 - **Xcode Command Line Tools** (for the Swift compiler)
 
 ```bash
-# Clone
+# Clone the repository
 git clone https://github.com/adarsh9780/mac_remote.git
 cd mac_remote
 
@@ -92,6 +107,8 @@ make build
 # Run the application
 open MacRemote.app
 ```
+
+## First Time Setup
 
 > **Accessibility Permissions**
 > MacRemote requires Accessibility permissions to control the mouse, keyboard, and system UI. Upon running the app for the first time, click "Grant Accessibility Permission" from the menu bar to open System Settings, and ensure MacRemote is toggled ON.
