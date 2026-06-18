@@ -35,7 +35,7 @@ public func swift_setBrightness(_ val: Float) {
     _ = SetBrightness(CGMainDisplayID(), val)
     
     DispatchQueue.main.async {
-        OSDWindowController.shared.show(type: .brightness, value: val)
+        NSLog("OSD Triggered for Brightness: \(val)"); OSDWindowController.shared.show(type: .brightness, value: val)
     }
 }
 
@@ -356,7 +356,7 @@ public func swift_setVolume(_ vol: Float32) {
     }
     
     DispatchQueue.main.async {
-        OSDWindowController.shared.show(type: .volume, value: vol)
+        NSLog("OSD Triggered for Volume: \(vol)"); OSDWindowController.shared.show(type: .volume, value: vol)
     }
 }
 
@@ -562,7 +562,7 @@ class OSDWindowController: NSObject, NSWindowDelegate {
                 self.window = win
             }
             
-            self.progressBar.doubleValue = Double(value * 100)
+            NSLog("OSD show() executing on main thread. Value: \(value)"); self.progressBar.doubleValue = Double(value * 100)
             
             if type == .volume {
                 let name = value > 0.66 ? "speaker.wave.3.fill" : (value > 0.33 ? "speaker.wave.2.fill" : (value > 0 ? "speaker.wave.1.fill" : "speaker.slash.fill"))
