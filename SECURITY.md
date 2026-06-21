@@ -3,7 +3,7 @@
 ## Scope
 
 Mac Remote is a local-network tool. The server only accepts connections
-from devices on the same Wi-Fi/LAN as the Mac it's running on — it is
+from devices on the same Wi-Fi/LAN as the Mac it's running on, it is
 never exposed to the public internet. Pairing requires a one-time
 passcode or QR code shown on the Mac's own screen, and only one device
 can be connected at a time.
