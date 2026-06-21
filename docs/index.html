@@ -1,15 +1,133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/mac_remote/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Control your Mac from your phone without installing an app." />
-    <title>Mac Remote</title>
-    <script type="module" crossorigin src="/mac_remote/assets/index-CiPduz7Z.js"></script>
-    <link rel="stylesheet" crossorigin href="/mac_remote/assets/index-BNRwIfjq.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Control your Mac from your phone without installing an app.">
+  <title>Mac Remote</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav>
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="icon.png" alt="Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px; border-radius: 6px;">
+        Mac Remote
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="tos.html">Terms of Service</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <img src="icon.png" alt="Mac Remote Icon" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h1>Mac Remote</h1>
+        <p>Control your Mac from your phone without installing an app.</p>
+        <div class="actions">
+          <div class="code-block">
+            <code>curl -sL https://raw.githubusercontent.com/adarsh9780/mac_remote/main/install.sh | bash</code>
+          </div>
+          <a href="https://github.com/adarsh9780/mac_remote" class="btn btn-secondary">View on GitHub</a>
+        </div>
+        
+        <div class="hero-gallery">
+          <img src="screenshots/media-controls.png" alt="Media Controls">
+          <img src="screenshots/app-switcher.png" alt="App Switcher">
+          <img src="screenshots/keyboard.png" alt="Keyboard">
+        </div>
+      </div>
+    </section>
+
+    <section class="section glass-panel" style="margin: 40px auto; max-width: 1000px; border-radius: 0;">
+      <div class="container">
+        <h2 class="section-title">Features</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <img src="screenshots/brightness-vol.png" alt="Brightness and Volume controls">
+            <h3>Brightness &amp; Volume</h3>
+            <p>Control brightness and volume with a live readout of the current value.</p>
+          </div>
+          <div class="feature-card">
+            <img src="screenshots/media-controls.png" alt="Media Controls">
+            <h3>Media Controls</h3>
+            <p>Rewind, previous, play/pause, next, fast-forward, plus a scrolling "Now Playing" readout.</p>
+          </div>
+          <div class="feature-card">
+            <img src="screenshots/trackpad-settings.png" alt="Trackpad Settings">
+            <h3>Trackpad</h3>
+            <p>Move the cursor with adjustable pointer sensitivity and scroll speed.</p>
+          </div>
+          <div class="feature-card">
+            <img src="screenshots/keyboard.png" alt="Keyboard">
+            <h3>Native Keyboard</h3>
+            <p>Type into text fields using your phone's native keyboard. Includes a "Send Enter" action.</p>
+          </div>
+          <div class="feature-card">
+            <img src="screenshots/app-switcher.png" alt="App Switcher">
+            <h3>Remote App Switcher</h3>
+            <p>See what's running and launch or switch to an app directly from your phone.</p>
+          </div>
+          <div class="feature-card" style="display: flex; flex-direction: column; justify-content: center;">
+            <h3>Zero Install on Client</h3>
+            <p>Works from Safari, Chrome, or any mobile browser.</p>
+            <h3 style="margin-top: 20px;">Two-Way Synchronization</h3>
+            <p>If you change volume or media directly on your Mac, the web UI instantly updates.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container text-content glass-panel">
+        <h2>How it works</h2>
+        <p>
+          The Swift menu bar app starts the Go server and shows status controls (QR code pairing, quit) from the menu bar icon. The Go server serves the control UI and talks directly to the Swift object via Cgo to perform the native macOS actions.
+        </p>
+        <div class="code-block" style="margin: 20px 0; overflow-x: auto; white-space: pre;">
+Phone browser  ──HTTP──▶  Go server (menu bar app, :5050)  ──Cgo──▶  Swift object
+                                                          (CoreAudio, brightness,
+                                                           NSWorkspace, CGEvent)
+        </div>
+        
+        <h3>Security &amp; Pairing</h3>
+        <p>
+          Mac Remote is designed to operate on your local area network (LAN). It uses the following measures to restrict access:
+        </p>
+        <ul>
+          <li><strong>QR-code &amp; One-time-code pairing:</strong> An on-screen 6-digit one-time code is required before a new device gets control.</li>
+          <li><strong>Brute-force protection:</strong> Automatic lockout after 5 failed OTP attempts.</li>
+          <li><strong>Device Management:</strong> Mac Remote enforces exactly one connected device at a time. You can instantly disconnect the active user from the Mac menu bar to securely allow a new pairing.</li>
+        </ul>
+        
+        <h3>System Requirements</h3>
+        <ul>
+          <li><strong>macOS</strong> 13.0 or later</li>
+          <li><strong>Go</strong> 1.21+ (only if building from source)</li>
+          <li><strong>Xcode Command Line Tools</strong> (only if building from source)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>
+        <a href="https://github.com/adarsh9780/mac_remote/blob/main/SECURITY.md">Security Policy</a>
+        <a href="https://github.com/adarsh9780/mac_remote">GitHub</a>
+        <a href="https://www.linkedin.com/in/adarshmaurya/">LinkedIn</a>
+      </div>
+      <div class="footer-bottom">
+        <p>Built by one person. Released under the MIT License.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
 </html>
