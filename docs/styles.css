@@ -1,7 +1,7 @@
 :root {
   --bg-color: #08080a;
   --text-color: #dcdee1;
-  --text-muted: #8e8e93;
+  --text-muted: #a1a1a6;
   --accent-color: #39ff14;
   --accent-hover: #32e011;
   --glass-bg: rgba(255, 255, 255, 0.03);
@@ -75,10 +75,12 @@ a:hover {
 .btn-secondary {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
+  color: #fff;
 }
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .hero {
